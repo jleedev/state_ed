@@ -11,49 +11,49 @@ struct AppendMode;
 struct CommandMode;
 
 impl AppendMode {
-    pub fn step(&self, line: String, buf: &mut Buf) -> ModeWrapper {
+    pub fn step(&self, line: String, buf: &mut Buf) -> Mode {
         if line == "." {
-            ModeWrapper::CommandMode(CommandMode)
+            Mode::CommandMode(CommandMode)
         } else {
             // push line
             buf.buf.insert(buf.addr, line);
             buf.addr += 1;
-            ModeWrapper::AppendMode(AppendMode)
+            Mode::AppendMode(AppendMode)
         }
     }
 }
 
 impl CommandMode {
-    pub fn step(&self, line: String, buf: &mut Buf) -> ModeWrapper {
+    pub fn step(&self, line: String, buf: &mut Buf) -> Mode {
         if line == "a" {
-            ModeWrapper::AppendMode(AppendMode)
+            Mode::AppendMode(AppendMode)
         } else if line == ",p" {
             // not good
             println!("{}", buf.concat_lines());
-            ModeWrapper::CommandMode(CommandMode)
+            Mode::CommandMode(CommandMode)
         } else if line.ends_with("d") {
             let (a, _) = line.split_at(line.len() - 1);
             let addr: usize = a.parse().expect("number");
             buf.buf.remove(addr - 1);
             // delete nth or current line
-            ModeWrapper::CommandMode(CommandMode)
+            Mode::CommandMode(CommandMode)
         } else {
             println!("?");
-            ModeWrapper::CommandMode(CommandMode)
+            Mode::CommandMode(CommandMode)
         }
     }
 }
 
-enum ModeWrapper {
+enum Mode {
     AppendMode(AppendMode),
     CommandMode(CommandMode),
 }
 
-impl ModeWrapper {
+impl Mode {
     pub fn step(&self, line: String, buf: &mut Buf) -> Self {
         match self {
-            &ModeWrapper::AppendMode(ref inner) => inner.step(line, buf),
-            &ModeWrapper::CommandMode(ref inner) => inner.step(line, buf),
+            &Mode::AppendMode(ref inner) => inner.step(line, buf),
+            &Mode::CommandMode(ref inner) => inner.step(line, buf),
         }
     }
 }
@@ -77,14 +77,14 @@ impl Buf {
 
 pub struct Ed {
     buf: Buf,
-    mode: ModeWrapper,
+    mode: Mode,
 }
 
 impl Ed {
     pub fn new() -> Self {
         Ed {
             buf: Buf::new(),
-            mode: ModeWrapper::CommandMode(CommandMode),
+            mode: Mode::CommandMode(CommandMode),
         }
     }
     pub fn send(&mut self, line: String) {
