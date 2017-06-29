@@ -1,0 +1,6 @@
+[package]
+name = "state_ed"
+version = "0.1.0"
+authors = ["Josh Lee <jleedev@gmail.com>"]
+
+[dependencies]
