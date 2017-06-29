@@ -28,8 +28,8 @@ impl CommandMode {
         if line == "a" {
             ModeWrapper::AppendMode(AppendMode)
         } else if line == ",p" {
-            // dumb hack
-            println!("{:?}", buf.buf);
+            // not good
+            println!("{}", buf.concat_lines());
             ModeWrapper::CommandMode(CommandMode)
         } else if line.ends_with("d") {
             let (a, _) = line.split_at(line.len() - 1);
